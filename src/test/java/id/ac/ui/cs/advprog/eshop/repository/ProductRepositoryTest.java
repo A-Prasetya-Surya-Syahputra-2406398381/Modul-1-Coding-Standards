@@ -65,4 +65,83 @@ public class ProductRepositoryTest {
         assertFalse(productIterator.hasNext());
     }
 
+    @Test
+    void testEditProductSuccess() {
+        Product product = new Product();
+        product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product.setProductName("Sampo Lama");
+        product.setProductQuantity(100);
+
+        productRepository.create(product);
+
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        updatedProduct.setProductName("Sampo Baru");
+        updatedProduct.setProductQuantity(50);
+
+        Product result = productRepository.update(updatedProduct);
+
+        assertNotNull(result);
+        assertEquals("Sampo Baru", result.getProductName());
+        assertEquals(50, result.getProductQuantity());
+
+        Product savedProduct = productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        assertEquals("Sampo Baru", savedProduct.getProductName());
+    }
+
+
+    @Test
+    void testEditProductFail() {
+        Product product = new Product();
+        product.setProductId("id-asli");
+        product.setProductName("Barang Asli");
+
+        productRepository.create(product);
+
+        Product nonExistentProduct = new Product();
+        nonExistentProduct.setProductId("id-palsu");
+        nonExistentProduct.setProductName("Hantu");
+
+        Product result = productRepository.update(nonExistentProduct);
+
+        assertNull(result);
+
+    }
+
+
+    @Test
+    void testDeleteProductSuccess() {
+        Product product = new Product();
+        product.setProductId("id-akan-dihapus");
+        product.setProductName("Barang Sementara");
+
+        productRepository.create(product);
+
+        assertNotNull(productRepository.findById("id-akan-dihapus"));
+
+        productRepository.delete("id-akan-dihapus");
+
+        Product result = productRepository.findById("id-akan-dihapus");
+        assertNull(result);
+
+        Iterator<Product> iterator = productRepository.findAll();
+        assertFalse(iterator.hasNext());
+    }
+
+
+    @Test
+    void testDeleteProductFail() {
+        Product product = new Product();
+        product.setProductId("id-aman");
+        product.setProductName("Barang Aman");
+        productRepository.create(product);
+
+        productRepository.delete("id-tidak-ada");
+
+        Product result = productRepository.findById("id-aman");
+        assertNotNull(result);
+        assertEquals("Barang Aman", result.getProductName());
+    }
+
 }
