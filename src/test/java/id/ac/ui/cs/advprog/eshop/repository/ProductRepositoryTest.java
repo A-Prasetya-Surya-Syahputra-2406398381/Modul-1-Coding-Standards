@@ -96,17 +96,15 @@ public class ProductRepositoryTest {
         Product product = new Product();
         product.setProductId("id-asli");
         product.setProductName("Barang Asli");
-
         productRepository.create(product);
 
         Product nonExistentProduct = new Product();
         nonExistentProduct.setProductId("id-palsu");
         nonExistentProduct.setProductName("Hantu");
 
-        Product result = productRepository.update(nonExistentProduct);
-
-        assertNull(result);
-
+        assertThrows(IllegalArgumentException.class, () -> {
+            productRepository.update(nonExistentProduct);
+        });
     }
 
 
@@ -136,11 +134,13 @@ public class ProductRepositoryTest {
         product.setProductName("Barang Aman");
         productRepository.create(product);
 
-        productRepository.delete("id-tidak-ada");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            productRepository.delete("id-tidak-ada");
+        });
 
         Product result = productRepository.findById("id-aman");
         assertNotNull(result);
         assertEquals("Barang Aman", result.getProductName());
     }
-
 }
